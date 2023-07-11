@@ -82,4 +82,15 @@ RSpec.describe "Items API", type: :request do
       expect(item[:data][:attributes][:merchant_id]).to eq(merchant_1.id)
     end
   end
+
+  describe "post /api/v1/items" do
+    it "posts an item" do
+      merchant_1 = Merchant.create!(name: "Beezy's")
+
+      post "/api/v1/items"
+
+      expect(response).to be_successful
+
+    end
+  end
 end
