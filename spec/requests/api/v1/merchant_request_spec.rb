@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Merchants API" do
+RSpec.describe "Merchants API", type: :request do
   describe "get /api/v1/merchants" do
 
     it "sends a list of merchants" do
@@ -54,19 +54,22 @@ RSpec.describe "Merchants API" do
   describe "get /api/v1/merchants/:id/items" do
     it "sends one merchants items" do
       merchant_1 = Merchant.create!(name: "Beezy's")
+      merchant_2 = Merchant.create!(name: "Joey's")
 
       item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
-      item_1 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
-      item_1 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_1.id)
+      item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
+      item_3 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_1.id)
+      item_4 = Item.create!(name: "I'm In Your Mind Fuzz", description: "This is still so much better than Taylor Swift", unit_price: 2000, merchant_id: merchant_2.id)
 
       get "/api/v1/merchants/#{merchant_1.id}/items"
 
       expect(response).to be_successful
 
-      merchant_items = JSON.parse(response.body, symbolize_names: true)
+      merchant_1_items = JSON.parse(response.body, symbolize_names: true)
 
-      expect(merchant_items[:data].count).to eq(3)
-      merchant_items[:data].each do |item|
+      expect(merchant_1_items[:data].count).to eq(3)
+
+      merchant_1_items[:data].each do |item|
         expect(item).to have_key(:id)
         expect(item[:id].to_i).to be_an(Integer)
 
@@ -87,8 +90,13 @@ RSpec.describe "Merchants API" do
 
         expect(item[:attributes]).to have_key(:merchant_id)
         expect(item[:attributes][:merchant_id]).to be_an(Integer)
+
+        expect(item[:attributes][:name]).to_not eq("I'm In Your Mind Fuzz")
+        expect(item[:attributes][:description]).to_not eq("This is still so much better than Taylor Swift")
+        expect(item[:attributes][:unit_price]).to_not eq(2000)
+        expect(item[:attributes][:merchant_id]).to_not eq(merchant_2.id)
       end
     end
   end
-
 end
+
