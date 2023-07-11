@@ -27,6 +27,7 @@ gem "puma", "~> 5.0"
 gem 'bcrypt', '~> 3.1.7'
 gem "faraday"
 gem "figaro"
+gem 'jsonapi-serializer'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
@@ -45,6 +46,8 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
   gem "rspec-rails"
   gem "pry"
+  gem "factory_bot_rails"
+  gem "faker"
 end
 
 group :development do
