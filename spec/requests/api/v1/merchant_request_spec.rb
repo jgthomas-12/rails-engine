@@ -3,7 +3,10 @@ require "rails_helper"
 RSpec.describe "Merchants API", type: :request do
   describe "get /api/v1/merchants" do
     context "happy path" do
-      it "sends a list of merchants" do
+      it "returns a list of merchants when accessing GET /api/v1/merchants" do
+        Item.destroy_all
+        Merchant.destroy_all
+        
         merchant_1 = Merchant.create!(name: "Beezy's")
         merchant_2 = Merchant.create!(name: "Joey's")
         merchant_3 = Merchant.create!(name: "Josies'")
@@ -36,7 +39,7 @@ RSpec.describe "Merchants API", type: :request do
     end
 
     context "sad path" do
-      it "sends an error message" do
+      it "returns an error response when given an invalid parameter" do
         merchant_1 = Merchant.create!(name: "Beezy's")
         merchant_2 = Merchant.create!(name: "Joey's")
         merchant_3 = Merchant.create!(name: "Josies'")
@@ -52,7 +55,7 @@ RSpec.describe "Merchants API", type: :request do
 
   describe "get /api/v1/merchants/:id" do
     context "happy path" do
-      it "sends one merchant" do
+      it "returns one merchant when accessing GET /api/v1/merchants/:id" do
         merchant_1 = Merchant.create!(name: "Beezy's")
 
         get "/api/v1/merchants/#{merchant_1.id}"
@@ -68,7 +71,7 @@ RSpec.describe "Merchants API", type: :request do
     end
 
     context "sad path" do
-      it "sends an error message" do
+      it "returns an error response when given an invalid parameter" do
         merchant_1 = Merchant.create!(name: "Beezy's")
         merchant_2 = Merchant.create!(name: "Joey's")
         merchant_3 = Merchant.create!(name: "Josies'")
@@ -84,7 +87,7 @@ RSpec.describe "Merchants API", type: :request do
 
   describe "get /api/v1/merchants/:id/items" do
     context "happy path" do
-      it "sends one merchants items" do
+      it "returns items of a specific merchant when accessing GET /api/v1/merchants/:id/items" do
         merchant_1 = Merchant.create!(name: "Beezy's")
         merchant_2 = Merchant.create!(name: "Joey's")
 
@@ -132,7 +135,7 @@ RSpec.describe "Merchants API", type: :request do
     end
 
     context "sad path" do
-      it "sends an error message" do
+      it "returns an error response when given an invalid parameter" do
         merchant_1 = Merchant.create!(name: "Beezy's")
 
         item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
