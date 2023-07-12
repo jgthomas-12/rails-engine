@@ -30,7 +30,6 @@ RSpec.describe "Items API", type: :request do
           expect(item).to have_key(:type)
           expect(item[:type]).to be_a(String)
 
-
           expect(item[:attributes]).to have_key(:name)
           expect(item[:attributes][:name]).to be_a(String)
 
@@ -77,7 +76,7 @@ RSpec.describe "Items API", type: :request do
         get api_v1_item_path(item_1.id)
 
         expect(response).to be_successful
-
+ 
         item = JSON.parse(response.body, symbolize_names: true)
 
         expect(item[:data]).to have_key(:id)
@@ -112,12 +111,11 @@ RSpec.describe "Items API", type: :request do
     describe "sad path" do
       # resource not found
       # invalid ID format
-      # related resource not found - no merchant 
+      # related resource not found - no merchant
       it "returns an error response when given an invalid parameter" do
         merchant_1 = Merchant.create!(name: "Beezy's")
 
         item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
-        # item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
 
         get api_v1_item_path(item_1.id), params: { invalid_param: true }
 
@@ -206,6 +204,58 @@ RSpec.describe "Items API", type: :request do
     end
 
     # MAKE SAD PATH
+  end
+
+  describe " PUT /api/v1/items/:id" do
+    describe "happy path" do
+      it "updates an existing item" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
+        item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+        previous_name = item_1.name
+
+        item_1_params = { name: "Infest The Rat's Nest", description: "This is still also a record", unit_price: 1000, merchant_id: merchant_1.id }
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        patch api_v1_item_path(item_1), headers: headers, params: JSON.generate(item_1_params)
+        updated_item = Item.find(item_1.id)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+        expect(previous_name).to_not eq(updated_item.name)
+        expect(updated_item.name).to eq("Infest The Rat's Nest")
+      end
+
+      it "updates an existing item with partial data input" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
+        item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+        update_params = { name: "Infest The Rat's Nest" }
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        patch api_v1_item_path(item_1), headers: headers, params: JSON.generate(update_params)
+        updated_item = Item.find(item_1.id)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+        expect(updated_item.name).to eq("Infest The Rat's Nest")
+        expect(updated_item.description).to eq(item_1.description)
+      end
+    end
+
+    describe "sad path" do
+      it "returns an error response when merchant doens't exist" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
+
+        item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+        invalid_params = { merchant_id: 303 }
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        patch api_v1_item_path(item_1), headers: headers, params: JSON.generate(invalid_params)
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+        expect(response.parsed_body).to have_key("error")
+      end
+    end
   end
 end
 
