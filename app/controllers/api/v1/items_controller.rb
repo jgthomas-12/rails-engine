@@ -3,7 +3,7 @@ class Api::V1::ItemsController < ApplicationController
     if params[:invalid_param]
       render json: { error: "Invalid Parameter" }, status: :bad_request
     else
-      render json: ItemSerializer.new(Item.all)
+      render json: ItemSerializer.new(Item.all), status: :ok
     end
   end
 
@@ -22,6 +22,11 @@ class Api::V1::ItemsController < ApplicationController
     else
       render json: { error: item.errors.full_messages }, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    item = Item.find(params[:id])
+    item.destroy
   end
 
   private
