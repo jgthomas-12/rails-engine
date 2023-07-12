@@ -1,13 +1,21 @@
 class Api::V1::ItemsController < ApplicationController
   def index
-    render json: ItemSerializer.new(Item.all)
+    if params[:invalid_param]
+      render json: { error: "Invalid Parameter" }, status: :bad_request
+    else
+      render json: ItemSerializer.new(Item.all)
+    end
   end
 
   def show
-    render json: ItemSerializer.new(Item.find(params[:id]))
+    if params[:invalid_param]
+      render json: { error: "Invalid Parameter" }, status: :bad_request
+    else
+      render json: ItemSerializer.new(Item.find(params[:id]))
+    end
   end
 
   def create
-    require 'pry'; binding.pry
+    # require 'pry'; binding.pry
   end
 end
