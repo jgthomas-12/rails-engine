@@ -24,6 +24,17 @@ class Api::V1::ItemsController < ApplicationController
     end
   end
 
+  def update
+    item = Item.find(params[:id])
+
+    if item_params.has_key?(:merchant_id) && !Merchant.exists?(params[:merchant_id])
+      render json: { error: item.errors.full_messages }, status: :bad_request
+    else
+      item.update(item_params)
+      render json: ItemSerializer.new(item), status: :ok
+    end
+  end
+
   def destroy
     item = Item.find(params[:id])
     item.destroy
