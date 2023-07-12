@@ -6,7 +6,7 @@ RSpec.describe "Merchants API", type: :request do
       it "returns a list of merchants when accessing GET /api/v1/merchants" do
         Item.destroy_all
         Merchant.destroy_all
-        
+
         merchant_1 = Merchant.create!(name: "Beezy's")
         merchant_2 = Merchant.create!(name: "Joey's")
         merchant_3 = Merchant.create!(name: "Josies'")
@@ -44,7 +44,7 @@ RSpec.describe "Merchants API", type: :request do
         merchant_2 = Merchant.create!(name: "Joey's")
         merchant_3 = Merchant.create!(name: "Josies'")
 
-        get "/api/v1/merchants", params: { invalid_param: true }
+        get api_v1_merchants_path, params: { invalid_param: true }
 
         expect(response).to_not be_successful
         expect(response.status).to eq(400)
@@ -58,7 +58,7 @@ RSpec.describe "Merchants API", type: :request do
       it "returns one merchant when accessing GET /api/v1/merchants/:id" do
         merchant_1 = Merchant.create!(name: "Beezy's")
 
-        get "/api/v1/merchants/#{merchant_1.id}"
+        get api_v1_merchant_path(merchant_1.id)
 
         expect(response).to be_successful
 
@@ -76,7 +76,7 @@ RSpec.describe "Merchants API", type: :request do
         merchant_2 = Merchant.create!(name: "Joey's")
         merchant_3 = Merchant.create!(name: "Josies'")
 
-        get "/api/v1/merchants/#{merchant_1.id}", params: { invalid_param: true }
+        get api_v1_merchant_path(merchant_1.id), params: { invalid_param: true }
 
         expect(response).to_not be_successful
         expect(response.status).to eq(400)
@@ -96,7 +96,7 @@ RSpec.describe "Merchants API", type: :request do
         item_3 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_1.id)
         item_4 = Item.create!(name: "I'm In Your Mind Fuzz", description: "This is still so much better than Taylor Swift", unit_price: 2000, merchant_id: merchant_2.id)
 
-        get "/api/v1/merchants/#{merchant_1.id}/items"
+        get api_v1_merchant_items_path(merchant_1.id)
 
         expect(response).to be_successful
 
@@ -141,7 +141,7 @@ RSpec.describe "Merchants API", type: :request do
         item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
         item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
 
-        get "/api/v1/merchants/#{merchant_1.id}/items", params: { invalid_param: true }
+        get api_v1_merchant_items_path(merchant_1.id), params: { invalid_param: true }
 
         expect(response).to_not be_successful
         expect(response.status).to eq(400)

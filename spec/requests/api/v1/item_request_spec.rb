@@ -4,7 +4,7 @@ require "rails_helper"
 RSpec.describe "Items API", type: :request do
 
   describe "get /api/v1/items" do
-    context "happy path" do
+    describe "happy path" do
       it "returns a list of items when accessing GET /api/v1/items" do
         Item.destroy_all
         merchant_1 = Merchant.create!(name: "Beezy's")
@@ -30,8 +30,6 @@ RSpec.describe "Items API", type: :request do
           expect(item).to have_key(:type)
           expect(item[:type]).to be_a(String)
 
-          # expect(item).to have_key(:attributes)
-          # expect(item[:attributes]).to be_a(Hash)
 
           expect(item[:attributes]).to have_key(:name)
           expect(item[:attributes][:name]).to be_a(String)
@@ -48,7 +46,7 @@ RSpec.describe "Items API", type: :request do
       end
     end
 
-    context "sad path" do
+    describe "sad path" do
       # resource not found
       # invalid params
       # unauthorized access
@@ -70,7 +68,7 @@ RSpec.describe "Items API", type: :request do
   end
 
   describe "get /api/v1/items/:id" do
-    context "happy path" do
+    describe "happy path" do
       it "returns one item when accessing GET /api/v1/:id" do
         merchant_1 = Merchant.create!(name: "Beezy's")
 
@@ -111,10 +109,10 @@ RSpec.describe "Items API", type: :request do
       end
     end
 
-    context "sad path" do
+    describe "sad path" do
       # resource not found
       # invalid ID format
-      # related resource not found?
+      # related resource not found - no merchant 
       it "returns an error response when given an invalid parameter" do
         merchant_1 = Merchant.create!(name: "Beezy's")
 
@@ -131,9 +129,12 @@ RSpec.describe "Items API", type: :request do
   end
 
   describe "post /api/v1/items" do
-    context "happy path" do
+    describe "happy path" do
       it "posts an item when accessing POST /api/v1/items" do
+        Item.destroy_all
+
         merchant_1 = Merchant.create!(name: "Beezy's")
+        expect(Item.count).to eq(0)
 
         item_params = {
           name: "KG",
@@ -149,6 +150,7 @@ RSpec.describe "Items API", type: :request do
         new_item = Item.last
 
         expect(response).to be_successful
+        expect(Item.count).to eq(1)
 
         # expect(new_item.id).to eq(Item.all.last.id) isn't this obvious because we just assigned the new_item above?
         # is there a way to check the id?
@@ -159,7 +161,7 @@ RSpec.describe "Items API", type: :request do
       end
     end
 
-    context "sad path" do
+    describe "sad path" do
       # missing required parameters
       # invalid parameters
       # unauthorized access
@@ -187,7 +189,7 @@ RSpec.describe "Items API", type: :request do
   end
 
   describe "destroy /api/v1/items" do
-    context "happy path" do
+    describe "happy path" do
       it "deletes an item when accessing DELETE /api/v1/items" do
         Item.destroy_all
         merchant_1 = Merchant.create!(name: "Beezy's")
