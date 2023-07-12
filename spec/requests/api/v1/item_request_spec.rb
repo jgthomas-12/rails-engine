@@ -1,4 +1,5 @@
 require "rails_helper"
+# require "support/item_expectations"
 
 RSpec.describe "Items API", type: :request do
 
@@ -121,13 +122,68 @@ RSpec.describe "Items API", type: :request do
   end
 
   describe "post /api/v1/items" do
-    xit "posts an item" do
-      merchant_1 = Merchant.create!(name: "Beezy's")
+    context "happy path" do
+      it "posts an item when accessing POST /api/v1/items" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
 
-      post "/api/v1/items"
+        item_params = {
+          name: "KG",
+          description: "This is a record",
+          unit_price: 1000,
+          merchant_id: merchant_1.id
+        }
 
-      expect(response).to be_successful
+        post "/api/v1/items", params: { item: item_params }
 
+        expect(response).to be_successful
+
+        item = JSON.parse(response.body, symbolize_names: true)
+
+        expect(item[:data]).to have_key(:id)
+        expect(item[:data][:id].to_i).to be_an(Integer)
+
+        expect(item[:data]).to have_key(:type)
+        expect(item[:data][:type]).to be_a(String)
+
+        expect(item[:data]).to have_key(:attributes)
+        expect(item[:data][:attributes]).to be_a(Hash)
+
+        expect(item[:data][:attributes]).to have_key(:name)
+        expect(item[:data][:attributes][:name]).to be_a(String)
+
+        expect(item[:data][:attributes]).to have_key(:description)
+        expect(item[:data][:attributes][:description]).to be_a(String)
+
+        expect(item[:data][:attributes]).to have_key(:unit_price)
+        expect(item[:data][:attributes][:unit_price]).to be_a(Float)
+
+        expect(item[:data][:attributes]).to have_key(:merchant_id)
+        expect(item[:data][:attributes][:merchant_id]).to be_an(Integer)
+
+        expect(item[:data][:attributes][:name]).to eq("KG")
+        expect(item[:data][:attributes][:description]).to eq("This is a record")
+        expect(item[:data][:attributes][:unit_price]).to eq(1000)
+        expect(item[:data][:attributes][:merchant_id]).to eq(merchant_1.id)
+      end
+    end
+
+    context "sad path" do
+      it "returns an error message when given an invalid parameter" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
+
+        invalid_params = {
+          name: "",
+          description: "No good",
+          unit_price: 1000,
+          merchant_id: merchant_1.id
+        }
+
+        post "/api/v1/items", params: { invalid_param: true }
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(422)
+        expect(response.parsed_body).to have_key("error")
+      end
     end
   end
 end
