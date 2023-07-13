@@ -158,10 +158,13 @@ RSpec.describe "Merchants API", type: :request do
         merchant_3 = Merchant.create!(name: "Beezlebub's")
         merchant_4 = Merchant.create!(name: "Delilah's")
 
-        get "/api/v1/merchants/find?name=Beezy's"
+        query_params = {
+          name: "Beezy's"
+        }
+
+        get api_v1_find_merchant_path, params: query_params
 
         merchant = JSON.parse(response.body, symbolize_names: true)
-        # get "/api/vi/items/find", headers: headers, params: params
 
         expect(response).to be_successful
         expect(response.status).to eq(200)

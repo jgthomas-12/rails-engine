@@ -287,14 +287,18 @@ RSpec.describe "Items API", type: :request do
         item_3 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_2.id)
         item_4 = Item.create!(name: "KG KG KG KG", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_2.id)
 
-        get "/api/v1/items/find_all?name=KG"
+        query_params = {
+          name: "KG"
+        }
+
+        get api_v1_find_items_path, params: query_params
 
         items = JSON.parse(response.body, symbolize_names: true)
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
 
-        expect(items[:data]).to be_a(Array)
+        expect(items[:data]).to be_an(Array)
         expect(items[:data][0][:attributes]).to have_key(:name)
         expect(items[:data][0][:attributes][:name]).to be_a(String)
         expect(items[:data].count).to eq(2)
