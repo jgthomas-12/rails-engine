@@ -76,7 +76,7 @@ RSpec.describe "Items API", type: :request do
         get api_v1_item_path(item_1.id)
 
         expect(response).to be_successful
- 
+
         item = JSON.parse(response.body, symbolize_names: true)
 
         expect(item[:data]).to have_key(:id)
@@ -244,7 +244,6 @@ RSpec.describe "Items API", type: :request do
     describe "sad path" do
       it "returns an error response when merchant doens't exist" do
         merchant_1 = Merchant.create!(name: "Beezy's")
-
         item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
         invalid_params = { merchant_id: 303 }
         headers = {"CONTENT_TYPE" => "application/json"}
@@ -254,6 +253,24 @@ RSpec.describe "Items API", type: :request do
         expect(response).to_not be_successful
         expect(response.status).to eq(400)
         expect(response.parsed_body).to have_key("error")
+      end
+    end
+  end
+
+  describe "GET /api/v1/items/:id/merchant" do
+    describe "happy path" do
+      it "returns the merchant of a specific item" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
+        item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+
+        get api_v1_item_merchant_index_path(item_1)
+
+        merchant = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+        expect(merchant[:data][:id].to_i).to eq(merchant_1.id)
+        expect(merchant[:data][:attributes][:name]).to eq(merchant_1.name)
       end
     end
   end
