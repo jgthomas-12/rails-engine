@@ -149,5 +149,53 @@ RSpec.describe "Merchants API", type: :request do
       end
     end
   end
+
+  describe "GET /api/v1/merchants/find" do
+    describe "happy path" do
+      it "returns a single merchant" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
+        merchant_2 = Merchant.create!(name: "Joey's")
+        merchant_3 = Merchant.create!(name: "Beezlebub's")
+        merchant_4 = Merchant.create!(name: "Delilah's")
+
+        query_params = {
+          name: "Beezy's"
+        }
+
+        get api_v1_find_merchant_path, params: query_params
+
+        merchant = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+
+        expect(merchant[:data][:attributes]).to be_a(Hash)
+        expect(merchant[:data][:attributes]).to have_key(:name)
+        expect(merchant[:data][:attributes][:name]).to be_a(String)
+        expect(merchant[:data][:attributes][:name]).to eq(merchant_1.name)
+        expect(merchant[:data][:attributes][:name]).to_not eq(merchant_2.name)
+        expect(merchant[:data][:attributes][:name]).to_not eq(merchant_3.name)
+        expect(merchant[:data][:attributes][:name]).to_not eq(merchant_4.name)
+      end
+    end
+
+    describe "sad path" do
+      it "returns an successful response with no matching search" do
+        merchant_1 = Merchant.create!(name: "Beezy's")
+        merchant_2 = Merchant.create!(name: "Joey's")
+        merchant_3 = Merchant.create!(name: "Beezlebub's")
+        merchant_4 = Merchant.create!(name: "Delilah's")
+
+        get "/api/v1/merchants/find?name=Ricks"
+
+        non_merchant = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+
+        expect(non_merchant[:data][:id]).to eq(nil)
+      end
+    end
+  end
 end
 
