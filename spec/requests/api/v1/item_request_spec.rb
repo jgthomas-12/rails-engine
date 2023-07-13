@@ -165,7 +165,7 @@ RSpec.describe "Items API", type: :request do
       # unauthorized access
       # server errors
       # conflicting resource
-      it "returns an error message when given an invalid parameter" do
+      it "returns an error response when given an invalid parameter" do
         merchant_1 = Merchant.create!(name: "Beezy's")
 
         invalid_params = {
@@ -274,6 +274,35 @@ RSpec.describe "Items API", type: :request do
       end
     end
   end
+
+  describe "GET /api/v1/items/find_all?name=X" do
+    describe "happy path" do
+      it "returns a single item" do
+        Item.destroy_all
+        merchant_1 = Merchant.create!(name: "Beezy's")
+        merchant_2 = Merchant.create!(name: "Joey's")
+
+        item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+        item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
+        item_3 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_2.id)
+        item_4 = Item.create!(name: "KG KG KG KG", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_2.id)
+
+        get "/api/v1/items/find_all?name=KG"
+
+        items = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+
+        expect(items[:data]).to be_a(Array)
+        expect(items[:data][0][:attributes]).to have_key(:name)
+        expect(items[:data][0][:attributes][:name]).to be_a(String)
+        expect(items[:data].count).to eq(2)
+
+        expect(items[:data].first[:attributes][:name]).to eq(item_1.name)
+        expect(items[:data].second[:attributes][:name]).to eq(item_4.name)
+
+      end
+    end
+  end
 end
-
-
