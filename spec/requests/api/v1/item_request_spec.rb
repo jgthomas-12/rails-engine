@@ -205,6 +205,12 @@ RSpec.describe "Items API", type: :request do
 
     describe "sad path" do
       it "can destroy the items invoice if it is the only item on it" do
+        # merchant_1 = Merchant.create!(name: "Beezy's")
+        # item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+        # invoice = Invoice.create!(merchant_id: merchant_1.id, status: "completed")
+        # invoice_item_1 = InvoiceItem.create!(invoice_id: invoice.id, item_id: item_1.id)
+
+
         # Make Merchant
         # make item
         # make invoice_item
@@ -231,7 +237,6 @@ RSpec.describe "Items API", type: :request do
       #   # status should be 404
       # end
     end
-    # MAKE SAD PATH
   end
 
   describe "PUT /api/v1/items/:id" do
