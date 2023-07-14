@@ -11,3 +11,20 @@
 
 
 
+    # require 'pry'; binding.pry
+    # if params[:invalid_param]
+    #   render json: { error: "Invalid Parameter" }, status: :bad_request
+    # else
+    #   render json: MerchantSerializer.new(Merchant.find(params[:id]))
+    # end
+
+    # class Api::V1::Merchants::ItemsController < ApplicationController
+    #   def index
+    #     merchant = Merchant.find_by(params[:id])
+    #     if !merchant
+    #       render json: { error: "merchant not found" }, status: :bad_request
+    #     else
+    #       render json: ItemSerializer.new(merchant.items)
+    #     end
+    #   end
+    # end
