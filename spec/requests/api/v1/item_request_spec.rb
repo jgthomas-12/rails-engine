@@ -203,10 +203,43 @@ RSpec.describe "Items API", type: :request do
       end
     end
 
-    # MAKE SAD PATH
+    describe "sad path" do
+      it "can destroy the items invoice if it is the only item on it" do
+        # merchant_1 = Merchant.create!(name: "Beezy's")
+        # item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+        # invoice = Invoice.create!(merchant_id: merchant_1.id, status: "completed")
+        # invoice_item_1 = InvoiceItem.create!(invoice_id: invoice.id, item_id: item_1.id)
+
+
+        # Make Merchant
+        # make item
+        # make invoice_item
+        # make invoice
+
+        # delete item with one invoice to get success
+        # try to delete item with multiple invoices and get error
+        # expect response successful
+        # activerecord::record not found - raise error because it's been detroyed and can't find it anymore
+      end
+
+      # it "cannot destory an items invoice if there are multiple items on it" do
+      #   # merchant_1 = Merchant.create!(name: "Beezy's")
+
+      #   # item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+      #   # item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
+      #   # item_3 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_1.id)
+
+      #   # # make 3 Items
+      #   # make 3 invoice_item
+      #   # make 1 invoice
+
+      #   # response sitll successful
+      #   # status should be 404
+      # end
+    end
   end
 
-  describe " PUT /api/v1/items/:id" do
+  describe "PUT /api/v1/items/:id" do
     describe "happy path" do
       it "updates an existing item" do
         merchant_1 = Merchant.create!(name: "Beezy's")
@@ -305,7 +338,38 @@ RSpec.describe "Items API", type: :request do
 
         expect(items[:data].first[:attributes][:name]).to eq(item_1.name)
         expect(items[:data].second[:attributes][:name]).to eq(item_4.name)
+      end
+    end
+  end
 
+  describe "GET /api/v1/items/find_all?min_price=999" do
+    describe "happy path" do
+      it "returns all items by minimum price" do
+        Item.destroy_all
+        merchant_1 = Merchant.create!(name: "Beezy's")
+        merchant_2 = Merchant.create!(name: "Joey's")
+
+        item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 799, merchant_id: merchant_1.id)
+        item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
+        item_3 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1200, merchant_id: merchant_2.id)
+        item_4 = Item.create!(name: "KG KG KG KG", description: "This is so much better than Taylor Swift", unit_price: 1500, merchant_id: merchant_2.id)
+        item_5 = Item.create!(name: "Nonagon Infinity", description: "This is so, SO, much better than Taylor Swift", unit_price: 665, merchant_id: merchant_2.id)
+
+        query_params = {
+          min_price: 999
+        }
+
+        get api_v1_find_items_path, params: query_params
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+
+        items = JSON.parse(response.body, symbolize_names: true)[:data]
+        expect(items.count).to eq(3)
+
+        items.each do |item|
+          expect(item[:attributes][:unit_price]).to be >= 999
+        end
       end
     end
   end

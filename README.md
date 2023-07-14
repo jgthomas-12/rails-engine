@@ -22,3 +22,15 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+
+In your terminal please run:
+
+rake db:{drop,create,migrate,seed}
+
+followed by:
+
+rails db:schema:dump
+
+This should create the databases and schema
+

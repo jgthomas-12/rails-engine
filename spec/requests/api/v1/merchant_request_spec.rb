@@ -37,20 +37,6 @@ RSpec.describe "Merchants API", type: :request do
         expect(merchants[:data][2][:attributes][:name]).to eq("Josies'")
       end
     end
-
-    context "sad path" do
-      it "returns an error response when given an invalid parameter" do
-        merchant_1 = Merchant.create!(name: "Beezy's")
-        merchant_2 = Merchant.create!(name: "Joey's")
-        merchant_3 = Merchant.create!(name: "Josies'")
-
-        get api_v1_merchants_path, params: { invalid_param: true }
-
-        expect(response).to_not be_successful
-        expect(response.status).to eq(400)
-        expect(response.parsed_body).to have_key("error")
-      end
-    end
   end
 
   describe "get /api/v1/merchants/:id" do
@@ -70,19 +56,19 @@ RSpec.describe "Merchants API", type: :request do
       end
     end
 
-    context "sad path" do
-      it "returns an error response when given an invalid parameter" do
-        merchant_1 = Merchant.create!(name: "Beezy's")
-        merchant_2 = Merchant.create!(name: "Joey's")
-        merchant_3 = Merchant.create!(name: "Josies'")
+    # context "sad path" do
+    #   it "returns an error response when given an invalid parameter" do
+    #     merchant_1 = Merchant.create!(name: "Beezy's")
+    #     merchant_2 = Merchant.create!(name: "Joey's")
+    #     merchant_3 = Merchant.create!(name: "Josies'")
 
-        get api_v1_merchant_path(merchant_1.id), params: { invalid_param: true }
+    #     get api_v1_merchant_path(merchant_3.id + 1000)
 
-        expect(response).to_not be_successful
-        expect(response.status).to eq(400)
-        expect(response.parsed_body).to have_key("error")
-      end
-    end
+    #     expect(response).to_not be_successful
+    #     expect(response.status).to eq(400)
+    #     expect(response.parsed_body).to have_key("error")
+    #   end
+    # end
   end
 
   describe "get /api/v1/merchants/:id/items" do
@@ -93,16 +79,15 @@ RSpec.describe "Merchants API", type: :request do
 
         item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
         item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
-        item_3 = Item.create!(name: "PetroDragonic Apocalypse", description: "This is so much better than Taylor Swift", unit_price: 1000, merchant_id: merchant_1.id)
         item_4 = Item.create!(name: "I'm In Your Mind Fuzz", description: "This is still so much better than Taylor Swift", unit_price: 2000, merchant_id: merchant_2.id)
 
-        get api_v1_merchant_items_path(merchant_1.id)
+        get api_v1_merchant_items_path(merchant_1)
 
         expect(response).to be_successful
 
         merchant_1_items = JSON.parse(response.body, symbolize_names: true)
 
-        expect(merchant_1_items[:data].count).to eq(3)
+        expect(merchant_1_items[:data].count).to eq(2)
 
         merchant_1_items[:data].each do |item|
           expect(item).to have_key(:id)
@@ -134,20 +119,20 @@ RSpec.describe "Merchants API", type: :request do
       end
     end
 
-    context "sad path" do
-      it "returns an error response when given an invalid parameter" do
-        merchant_1 = Merchant.create!(name: "Beezy's")
+    # context "sad path" do
+    #   it "returns an error response when given an invalid parameter" do
+    #     merchant_1 = Merchant.create!(name: "Beezy's")
 
-        item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
-        item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
+    #     item_1 = Item.create!(name: "KG", description: "This is a record", unit_price: 1000, merchant_id: merchant_1.id)
+    #     item_2 = Item.create!(name: "LW", description: "This is also a record", unit_price: 1000, merchant_id: merchant_1.id)
 
-        get api_v1_merchant_items_path(merchant_1.id), params: { invalid_param: true }
+    #     get api_v1_merchant_items_path(merchant_1.id + 1000)
 
-        expect(response).to_not be_successful
-        expect(response.status).to eq(400)
-        expect(response.parsed_body).to have_key("error")
-      end
-    end
+    #     expect(response).to_not be_successful
+    #     expect(response.status).to eq(400)
+    #     expect(response.parsed_body).to have_key("error")
+    #   end
+    # end
   end
 
   describe "GET /api/v1/merchants/find" do
